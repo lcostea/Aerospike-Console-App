@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0-*",
+    "dependencies": {
+    },
+    "frameworks" : {
+        "dnx46" : {
+          "dependencies": {
+              "Aerospike.Client": "3.2.2"
+          }
+        }
+    }
+}
