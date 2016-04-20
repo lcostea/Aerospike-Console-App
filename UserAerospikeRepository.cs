@@ -1,14 +1,21 @@
-using CLM.AerospikeDemo.Domain;
 using Aerospike.Client;
+using System.Collections.Generic;
 
 namespace CLM.AerospikeDemo.Repository
 {
   public class UserAerospikeRepository
   {
-    public static void SaveUser(CLM.AerospikeDemo.Domain.User userToSave)
+    private string server;
+    private int port;
+    public UserAerospikeRepository(string server, int port)
+    {
+      this.server = server;
+      this.port = port;
+    }
+    public void SaveUser(CLM.AerospikeDemo.Domain.User userToSave)
     {
       // Establish connection the server
-        AerospikeClient client = new AerospikeClient("192.168.0.12", 3000);
+        AerospikeClient client = new AerospikeClient(server, port);
 
         // Create key
         Key userKey = new Key("test", "Users", userToSave.Email);
@@ -36,12 +43,48 @@ namespace CLM.AerospikeDemo.Repository
 
         Bin companyBin = new Bin("Company", userToSave.Company);
         userBins[6] = companyBin;
+        
+        try
+        {
+          client.Put(null, userKey, userBins);
+        }
+        finally
+        {
+          client.Close();
+        }
 
-        // Write record
-        client.Put(null, userKey, userBins);
+        
+    }
+    
+    public List<string> GetUserEmailsFromCity(string city)
+    {
+      List<string> userEmails = new List<string>();
+      AerospikeClient client = new AerospikeClient(server, port);
+      
+      Statement stmt = new Statement();
+      stmt.SetNamespace("test");
+      stmt.SetSetName("Users");
+      stmt.SetBinNames("Email");
+      stmt.SetFilters(Filter.Equal("City", city));
 
-        // Close connection
-        client.Close();
+      RecordSet userEmailsRecordSet = client.Query(null, stmt);
+      
+      try
+      {
+          while (userEmailsRecordSet.Next())
+          {
+              Record emailRecord = userEmailsRecordSet.Record;
+              string userEmailFromCity = emailRecord.GetValue("Email").ToString();
+              userEmails.Add(userEmailFromCity);
+          }
+      }
+      finally
+      {
+          userEmailsRecordSet.Close();
+          client.Close();
+      }
+      
+      return userEmails;
     }
   }
 }

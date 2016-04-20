@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System;
+
 using CLM.AerospikeDemo.Domain;
 using CLM.AerospikeDemo.Repository;
 
@@ -5,6 +8,7 @@ public class Program
 {
     public static void Main (string[] args)
     {
+      UserAerospikeRepository userAeroRepo = new UserAerospikeRepository("192.168.0.12", 3000);
             
       User userToSave1 = new User 
       { 
@@ -18,7 +22,7 @@ public class Program
       };
        
       
-      UserAerospikeRepository.SaveUser(userToSave1);
+      userAeroRepo.SaveUser(userToSave1);
       
       
       User userToSave2 = new User 
@@ -32,7 +36,7 @@ public class Program
         Country = "Romania" 
       };
       
-      UserAerospikeRepository.SaveUser(userToSave2);
+      userAeroRepo.SaveUser(userToSave2);
       
       
       User userToSave3 = new User 
@@ -46,7 +50,17 @@ public class Program
         Country = "Romania" 
       };
       
-      UserAerospikeRepository.SaveUser(userToSave3);
+      userAeroRepo.SaveUser(userToSave3);
+      
+      List<string> userEmailsFromCity = userAeroRepo.GetUserEmailsFromCity("Iasi");
+      
+      Console.WriteLine("Emails from Iasi: ");
+      foreach(string email in userEmailsFromCity)
+      {
+          Console.WriteLine(email);
+      }
+      
+      Console.ReadLine();
       
     }
 }
