@@ -14,15 +14,12 @@ namespace CLM.AerospikeDemo.Repository
     }
     public void SaveUser(CLM.AerospikeDemo.Domain.User userToSave)
     {
-      // Establish connection the server
         AerospikeClient client = new AerospikeClient(server, port);
 
-        // Create key
         Key userKey = new Key("test", "Users", userToSave.Email);
 
         Bin[] userBins = new Bin[7];
 
-        // Create Bins
         Bin firstNameBin = new Bin("FirstName", userToSave.FirstName);
         userBins[0] = firstNameBin;
 
